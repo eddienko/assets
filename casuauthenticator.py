@@ -33,7 +33,7 @@ class GenericLoginHandler(OAuthLoginHandler, GenericEnvMixin):
         self.log.info('OAuth redirect: %r', redirect_uri)
         state = self.get_state()
         self.set_state_cookie(state)
-        params = {'state': state, 'approval_promot': 'auto'}
+        params = {'state': state, 'approval_prompt': 'auto'}
         params.update(self.authenticator.extra_params)
         self.authorize_redirect(
             redirect_uri=redirect_uri,
