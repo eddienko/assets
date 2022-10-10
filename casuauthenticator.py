@@ -117,7 +117,6 @@ class HubAuthenticator(OAuthenticator):
 
     async def authenticate(self, handler, data=None):
         code = handler.get_argument("code")
-        print(code, type(code))
         # TODO: Configure the curl_httpclient for tornado
         http_client = AsyncHTTPClient()
 
@@ -158,6 +157,8 @@ class HubAuthenticator(OAuthenticator):
                           )
 
         resp = await http_client.fetch(req)
+
+        print('****', resp)
 
         resp_json = json.loads(resp.body.decode('utf8', 'replace'))
 
