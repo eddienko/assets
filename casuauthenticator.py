@@ -8,6 +8,9 @@ import json
 import os
 import base64
 import urllib
+import random
+import string
+import hashlib
 
 from tornado.auth import OAuth2Mixin
 from tornado import web
@@ -28,12 +31,20 @@ class GenericEnvMixin(OAuth2Mixin):
 
 
 class GenericLoginHandler(OAuthLoginHandler, GenericEnvMixin):
+    def get_code_challenge(self):
+        code_verifier = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(random.randint(43, 128)))
+        code_verifier = base64.urlsafe_b64encode(code_verifier.encode('utf-8'))
+
+        code_challenge = hashlib.sha256(code_verifier).digest()
+        code_challenge = base64.urlsafe_b64encode(code_challenge).decode('utf-8').replace('=', '')
+        return code_challenge
+
     def get(self):
         redirect_uri = self.authenticator.get_callback_url(self)
         self.log.info('OAuth redirect: %r', redirect_uri)
         state = self.get_state()
         self.set_state_cookie(state)
-        params = {'state': state, 'approval_prompt': 'auto'}
+        params = {'state': state, 'approval_prompt': 'auto', 'code_challenge_method': 'S256', 'code_challenge': self.get_code_challenge()}
         params.update(self.authenticator.extra_params)
         self.authorize_redirect(
             redirect_uri=redirect_uri,
