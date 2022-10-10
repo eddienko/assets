@@ -123,7 +123,7 @@ class HubAuthenticator(OAuthenticator):
         params = dict(
             redirect_uri=self.get_callback_url(handler),
             code=code,
-            code_verifier=self.code_verifier,
+            code_verifier=self.code_verifier.decode(),
             grant_type='authorization_code'
         )
         params.update(self.extra_params)
