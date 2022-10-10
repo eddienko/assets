@@ -32,9 +32,7 @@ class GenericEnvMixin(OAuth2Mixin):
 
 class GenericLoginHandler(OAuthLoginHandler, GenericEnvMixin):
     def get_code_challenge(self):
-        code_verifier = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(random.randint(43, 128)))
-        code_verifier = base64.urlsafe_b64encode(code_verifier.encode('utf-8'))
-
+        code_verifier = self.authenticator.code_verifier
         code_challenge = hashlib.sha256(code_verifier).digest()
         code_challenge = base64.urlsafe_b64encode(code_challenge).decode('utf-8').replace('=', '')
         return code_challenge
@@ -108,15 +106,26 @@ class HubAuthenticator(OAuthenticator):
         help="Disable basic authentication for access token request"
     )
 
+    @property
+    def code_verifier(self):
+        try:
+            return self._code_verifier
+        except:
+            code_verifier = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(random.randint(43, 128)))
+            code_verifier = base64.urlsafe_b64encode(code_verifier.encode('utf-8'))
+            self._code_verifier = code_verifier
+            return self._code_verifier
+
     async def authenticate(self, handler, data=None):
         code = handler.get_argument("code")
-        print('********', code)
+        print code)
         # TODO: Configure the curl_httpclient for tornado
         http_client = AsyncHTTPClient()
 
         params = dict(
             redirect_uri=self.get_callback_url(handler),
             code=code,
+            code_verifier=self.code_verifier,
             grant_type='authorization_code'
         )
         params.update(self.extra_params)
