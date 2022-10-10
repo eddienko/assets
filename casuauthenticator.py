@@ -141,6 +141,8 @@ class HubAuthenticator(OAuthenticator):
 
         resp_json = json.loads(resp.body.decode('utf8', 'replace'))
 
+        print('****', resp_json)
+
         access_token = resp_json['access_token']
         refresh_token = resp_json.get('refresh_token', None)
         token_type = resp_json['token_type']
