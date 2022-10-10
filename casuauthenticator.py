@@ -97,18 +97,6 @@ class HubAuthenticator(OAuthenticator):
         help="Disable basic authentication for access token request"
     )
 
-    client_id = Unicode(
-        os.environ.get('OAUTH2_CLIENT_ID', ''),
-        config=True,
-        help="Client ID"
-    )
-
-    client_secret = Unicode(
-        os.environ.get('OAUTH2_CLIENT_SECRET', ''),
-        config=True,
-        help="Client secret"
-    )
-
     async def authenticate(self, handler, data=None):
         code = handler.get_argument("code")
         # TODO: Configure the curl_httpclient for tornado
