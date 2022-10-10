@@ -43,7 +43,6 @@ class GenericLoginHandler(OAuthLoginHandler, GenericEnvMixin):
         state = self.get_state()
         self.set_state_cookie(state)
         params = {'state': state, 'approval_prompt': 'auto', 'code_challenge_method': 'S256', 'code_challenge': self.get_code_challenge()}
-        params.update(self.authenticator.extra_params)
         self.authorize_redirect(
             redirect_uri=redirect_uri,
             client_id=self.authenticator.client_id,
@@ -118,6 +117,7 @@ class HubAuthenticator(OAuthenticator):
 
     async def authenticate(self, handler, data=None):
         code = handler.get_argument("code")
+        print(code, type(code))
         # TODO: Configure the curl_httpclient for tornado
         http_client = AsyncHTTPClient()
 
