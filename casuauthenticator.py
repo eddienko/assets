@@ -148,6 +148,8 @@ class HubAuthenticator(OAuthenticator):
             )
             headers.update({"Authorization": "Basic {}".format(b64key.decode("utf8"))})
             headers['HTTP_AUTHORIZATION'] = headers['Authorization']
+        else:
+            params.update({"client_id": self.client_id, "client_secret": self.client_secret})
 
         req = HTTPRequest(url,
                           method="POST",
